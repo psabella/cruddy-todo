@@ -25,19 +25,32 @@ exports.create = (text, callback) => {
 };
 
 exports.readAll = (callback) => {
-  var data = _.map(items, (text, id) => {
-    return { id, text };
+  //need to make asynch
+  //items will be an array of file names (ids)
+  //str.slice(0, 5)
+  fs.readdir(exports.dataDir, (err, files) => {
+    if (err) {
+      callback(null, []);
+    } else {
+      var pamsHope = files.map(file => {
+        console.log(({ id: file.slice(0, 5), text: file.slice(0, 5) }));
+        return { id: file.slice(0, 5), text: file.slice(0, 5) };
+      });
+      callback(null, pamsHope);
+    }
   });
-  callback(null, data);
 };
 
+
 exports.readOne = (id, callback) => {
-  var text = items[id];
-  if (!text) {
-    callback(new Error(`No item with id: ${id}`));
-  } else {
-    callback(null, { id, text });
-  }
+  var filePath = path.join(exports.dataDir, id + '.txt');
+  fs.readFile(filePath, (err, fileData) => {
+    if (err) {
+      callback(new Error(`No item with id: ${id}`));
+    } else {
+      callback(null, {id, text: fileData.toString()});
+    }
+  });
 };
 
 exports.update = (id, text, callback) => {
